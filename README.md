@@ -1,4 +1,4 @@
-# rop-emporium-ret2win-arm
+# ROP Emporium ret2win on ARMv5 — Walkthrough
 A walkthrough of the ROP Emporium ret2win challenge on ARMv5.
 
 If you’re learning binary exploitation, ARM challenges can feel like a big jump from x86. Even simple ret2win-style problems suddenly come with new registers, emulation, and a slightly different debugging setup.

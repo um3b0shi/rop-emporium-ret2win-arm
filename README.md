@@ -12,25 +12,25 @@ Check the file architecture:
 ```bash
 file ret2win_armv5
 ```
-![Binary identified as a 32-bit ARM executable](file.png)
+![Binary identified as a 32-bit ARM executable](images/file.png)
 
 Check security protections:
 ```bash
 checksec ret2win_armv5
 ```
-![Security protections on the binary](checksec.png)
+![Security protections on the binary](images/checksec.png)
 
 Get basic binary info:
 ```bash
 rabin2 -I ret2win_armv5
 ```
-![Basic binary information](rabin2.png)
+![Basic binary information](images/rabin2.png)
 
 List functions in the binary:
 ```bash
 rabin2 -s ret2win_armv5 | grep FUNC
 ```
-![Listing functions in the binary using rabin2](rabin2-func.png)
+![Listing functions in the binary using rabin2](images/rabin2-func.png)
 
 ## Running the Binary using QEMU
 
@@ -46,7 +46,7 @@ Now we can run the binary to see what it does:
 # Run the ARM binary directly
 qemu-arm -L /usr/arm-linux-gnueabi ./ret2win_armv5
 ```
-![Running the binary using QEMU](qemu-arm.png)
+![Running the binary using QEMU](images/qemu-arm.png)
 
 So we know that the buffer size is 32 bytes, but the binary accepts 56 bytes of input. It uses read() so we don’t have to worry about null bytes.
 
@@ -81,15 +81,15 @@ When it asks for input, open a third terminal and cat the content of pattern.txt
 ```bash
 cat pattern.txt
 ```
-![Cyclic pattern used to trigger and analyse the crash](pattern.png)
+![Cyclic pattern used to trigger and analyse the crash](images/pattern.png)
 
 Copy and paste that into the GDB terminal where the program is waiting for input. Don’t include the `b’` and other quotes you might see. 
-![Feeding the cyclic pattern as input to the running binary](qemu-pattern.png)
+![Feeding the cyclic pattern as input to the running binary](images/qemu-pattern.png)
 
 Hit enter. 
 
 The program should now crash:
-![Program crash after processing the cyclic pattern](segfault.png)
+![Program crash after processing the cyclic pattern](images/segfault.png)
 
 ## Inspecting the Program Counter
 
@@ -108,7 +108,7 @@ What happens here is:
 5. That address is not valid → crash
    
 Because of this, we always check `$pc` to confirm whether we have overwritten the return address.
-![`pc` overwritten with cyclic pattern data](pc.png)
+![`pc` overwritten with cyclic pattern data](images/pc.png)
 
 Here we can see that the program tried to jump to address 0x6161616a which is the “jaaa” from our pattern. This is what we overwrote. 
 
@@ -118,7 +118,7 @@ Now let's find the offset:
 ```bash
 python3 -c "from pwn import *; print(cyclic_find(0x6161616a))"
 ```
-![Calculating the offset](offset.png)
+![Calculating the offset](images/offset.png)
 
 So we need 36 bytes to reach the return address, then the next 4 bytes will overwrite `$pc`. 
 
@@ -132,17 +132,17 @@ You can use whatever tool you want for this, this time we’ll use Ghidra.
 
 The pwnme function is what we see when the binary runs:
 
-![Identifying the vulnerable `pwnme` function in Ghidra](pwnme.png)
+![Identifying the vulnerable `pwnme` function in Ghidra](images/pwnme.png)
 
 Now we look at the ret2win function: 
 
-![Inspecting the `ret2win` function in Ghidra](ret2win.png)
+![Inspecting the `ret2win` function in Ghidra](images/ret2win.png)
 
 This looks like the function we need to jump to. 
 
 Now we just have to find the address. Look at the first address that’s shown after the ret2win function starts in Ghidra:
 
-![Function entry address for `ret2win`](ret2win-addr.png)
+![Function entry address for `ret2win`](images/ret2win-addr.png)
 
 So the address is `000105ec` which we can write as `0x105ec` (remove leading zeros) 
 
@@ -178,5 +178,5 @@ Save the above as a .py script and run it:
 ```bash
 python3 exploit.py
 ```
-![Exploit successfully redirects to execution to `ret2win`](flag.png)
+![Exploit successfully redirects to execution to `ret2win`](images/flag.png)
 

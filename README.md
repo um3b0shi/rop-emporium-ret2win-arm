@@ -54,7 +54,7 @@ So we know that the buffer size is 32 bytes, but the binary accepts 56 bytes of 
 
 Now we need to find the crashpoint. 
 
-To do this, we’ll create a pattern to identify where we overwrite the return address. We can use metasploit to keep it simple. First you’ll need to download the metasploit framework. (I’m using Ubuntu) 
+To do this, we’ll create a pattern to identify where we overwrite the return address. 
 
 We’ll use pwntools, since we’ll be using it to write the exploit later. But you can also use metasploit pattern.
 
